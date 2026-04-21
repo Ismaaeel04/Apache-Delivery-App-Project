@@ -1,140 +1,112 @@
 import java.awt.*;
+import java.awt.event.*;
 import java.sql.*;
 import javax.swing.*;
 
 public class registerForm extends JFrame {
 
+    final private Font mainFont = new Font("Verdana", Font.BOLD, 16);
+
     public void initialize() {
 
         setTitle("Create Account - APACHE Delivery App");
-        setSize(420, 620);
+        setSize(400, 580);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
-        getContentPane().setBackground(new Color(30, 30, 45));
-
-        // Card
-        JPanel card = new JPanel(new GridLayout(0, 1, 0, 10));
-        card.setBackground(new Color(42, 42, 60));
-        card.setBorder(BorderFactory.createEmptyBorder(30, 40, 30, 40));
 
         // Title
         JLabel title = new JLabel("Create Account", SwingConstants.CENTER);
-        title.setFont(new Font("Arial", Font.BOLD, 24));
-        title.setForeground(new Color(99, 102, 241));
+        title.setFont(new Font("Verdana", Font.BOLD, 24));
+        title.setBorder(BorderFactory.createEmptyBorder(25, 0, 10, 0));
+        add(title, BorderLayout.NORTH);
 
-        JLabel subtitle = new JLabel("Fill in your details below", SwingConstants.CENTER);
-        subtitle.setFont(new Font("Arial", Font.PLAIN, 13));
-        subtitle.setForeground(new Color(160, 160, 180));
-
-        // Fields
-        JTextField     tfUsername  = createField();
-        JTextField     tfEmail     = createField();
+        // Form fields
+        JTextField     tfUsername  = new JTextField();
+        JTextField     tfEmail     = new JTextField();
         JPasswordField tfPassword  = new JPasswordField();
         JPasswordField tfPassword2 = new JPasswordField();
-        JTextField     tfPhone     = createField();
-        JTextField     tfAddress   = createField();
+        JTextField     tfPhone     = new JTextField();
+        JTextField     tfAddress   = new JTextField();
 
-        styleField(tfPassword);
-        styleField(tfPassword2);
+        // Set font to all fields manually
+        tfUsername.setFont(mainFont);
+        tfEmail.setFont(mainFont);
+        tfPhone.setFont(mainFont);
+        tfAddress.setFont(mainFont);
+        tfPassword.setFont(mainFont);
+        tfPassword2.setFont(mainFont);
 
-        // Register button
+        JPanel formPanel = new JPanel(new GridLayout(0, 1, 0, 6));
+        formPanel.setBorder(BorderFactory.createEmptyBorder(10, 40, 10, 40));
+
+        formPanel.add(createLabel("Username"));         formPanel.add(tfUsername);
+        formPanel.add(createLabel("Email"));            formPanel.add(tfEmail);
+        formPanel.add(createLabel("Password"));         formPanel.add(tfPassword);
+        formPanel.add(createLabel("Confirm Password")); formPanel.add(tfPassword2);
+        formPanel.add(createLabel("Phone"));            formPanel.add(tfPhone);
+        formPanel.add(createLabel("Address"));          formPanel.add(tfAddress);
+
+        add(formPanel, BorderLayout.CENTER);
+
+        // Buttons
         JButton btnRegister = new JButton("Register");
-        btnRegister.setFont(new Font("Arial", Font.BOLD, 15));
-        btnRegister.setBackground(new Color(99, 102, 241));
-        btnRegister.setForeground(Color.WHITE);
-        btnRegister.setFocusPainted(false);
-        btnRegister.setBorderPainted(false);
-        btnRegister.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnRegister.setFont(mainFont);
+        btnRegister.setBackground(Color.WHITE);
 
         JButton btnCancel = new JButton("Cancel");
-        btnCancel.setFont(new Font("Arial", Font.PLAIN, 14));
-        btnCancel.setBackground(new Color(55, 55, 75));
-        btnCancel.setForeground(new Color(200, 200, 200));
-        btnCancel.setFocusPainted(false);
-        btnCancel.setBorderPainted(false);
-        btnCancel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnCancel.addActionListener(e -> dispose());
+        btnCancel.setFont(mainFont);
+        btnCancel.setBackground(Color.WHITE);
 
-        JPanel btnPanel = new JPanel(new GridLayout(1, 2, 10, 0));
-        btnPanel.setBackground(new Color(42, 42, 60));
-        btnPanel.add(btnRegister);
-        btnPanel.add(btnCancel);
-
-        card.add(title);
-        card.add(subtitle);
-        card.add(Box.createRigidArea(new Dimension(0, 5)));
-        card.add(createLabel("Username"));   card.add(tfUsername);
-        card.add(createLabel("Email"));      card.add(tfEmail);
-        card.add(createLabel("Password"));   card.add(tfPassword);
-        card.add(createLabel("Confirm Password")); card.add(tfPassword2);
-        card.add(createLabel("Phone"));      card.add(tfPhone);
-        card.add(createLabel("Address"));    card.add(tfAddress);
-        card.add(Box.createRigidArea(new Dimension(0, 5)));
-        card.add(btnPanel);
-
-        // Wrap card
-        JPanel wrapper = new JPanel(new GridBagLayout());
-        wrapper.setBackground(new Color(30, 30, 45));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 0.85;
-        gbc.insets = new Insets(20, 30, 20, 30);
-        wrapper.add(card, gbc);
-
-        add(wrapper, BorderLayout.CENTER);
-
-        btnRegister.addActionListener(e -> {
-            String username  = tfUsername.getText().trim();
-            String email     = tfEmail.getText().trim();
-            String password  = String.valueOf(tfPassword.getPassword());
-            String password2 = String.valueOf(tfPassword2.getPassword());
-            String phone     = tfPhone.getText().trim();
-            String address   = tfAddress.getText().trim();
-
-            if (username.isEmpty() || email.isEmpty() || password.isEmpty()
-                    || phone.isEmpty() || address.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please fill in all fields.");
-                return;
-            }
-
-            if (!password.equals(password2)) {
-                JOptionPane.showMessageDialog(this, "Passwords do not match.");
-                return;
-            }
-
-            if (registerUser(username, email, password, phone, address)) {
-                JOptionPane.showMessageDialog(this, "Account created! You can now log in.");
+        btnCancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 dispose();
-            } else {
-                JOptionPane.showMessageDialog(this, "Registration failed. Email may already be in use.");
             }
         });
+
+        btnRegister.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                String username  = tfUsername.getText().trim();
+                String email     = tfEmail.getText().trim();
+                String password  = String.valueOf(tfPassword.getPassword());
+                String password2 = String.valueOf(tfPassword2.getPassword());
+                String phone     = tfPhone.getText().trim();
+                String address   = tfAddress.getText().trim();
+
+                if (username.isEmpty() || email.isEmpty() || password.isEmpty()
+                        || phone.isEmpty() || address.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Please fill in all fields.");
+                    return;
+                }
+
+                if (password.equals(password2) == false) {
+                    JOptionPane.showMessageDialog(null, "Passwords do not match.");
+                    return;
+                }
+
+                if (registerUser(username, email, password, phone, address)) {
+                    JOptionPane.showMessageDialog(null, "Account created! You can now log in.");
+                    dispose();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Registration failed. Email may already be in use.");
+                }
+            }
+        });
+
+        JPanel buttonsPanel = new JPanel(new GridLayout(1, 2, 10, 0));
+        buttonsPanel.setBorder(BorderFactory.createEmptyBorder(10, 40, 20, 40));
+        buttonsPanel.add(btnRegister);
+        buttonsPanel.add(btnCancel);
+
+        add(buttonsPanel, BorderLayout.SOUTH);
 
         setVisible(true);
     }
 
-    private JTextField createField() {
-        JTextField field = new JTextField();
-        styleField(field);
-        return field;
-    }
-
-    private void styleField(JTextField field) {
-        field.setFont(new Font("Arial", Font.PLAIN, 14));
-        field.setBackground(new Color(55, 55, 75));
-        field.setForeground(Color.WHITE);
-        field.setCaretColor(Color.WHITE);
-        field.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(80, 80, 110), 1),
-            BorderFactory.createEmptyBorder(8, 12, 8, 12)
-        ));
-    }
-
     private JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
-        label.setFont(new Font("Arial", Font.BOLD, 12));
-        label.setForeground(new Color(160, 160, 180));
+        label.setFont(new Font("Verdana", Font.BOLD, 14));
         return label;
     }
 
